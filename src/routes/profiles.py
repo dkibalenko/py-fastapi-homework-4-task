@@ -130,7 +130,7 @@ async def create_user_profile(
                 detail="Failed to upload avatar. Please try again later."
             )
         
-        # avatar_url = await s3_client.get_file_url(file_name)
+        avatar_url = await s3_client.get_file_url(file_name)
 
     try:
         profile_model = UserProfileModel(
@@ -140,8 +140,7 @@ async def create_user_profile(
             gender=user_data.gender,
             date_of_birth=user_data.date_of_birth,
             info=user_data.info,
-            avatar=file_name
-            # avatar=avatar_url
+            avatar=avatar_url
         )
 
         db.add(profile_model)
