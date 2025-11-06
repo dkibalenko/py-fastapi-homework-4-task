@@ -220,7 +220,7 @@ async def activate_account(
 
     now_utc = datetime.now(timezone.utc)
     if (
-        not token_record 
+        not token_record
         or cast(
             datetime, token_record.expires_at
         )
@@ -245,7 +245,7 @@ async def activate_account(
     await db.delete(token_record)
     await db.commit()
 
-    login_link = f"http://127.0.0.1:8000/api/v1/accounts/login/"
+    login_link = "http://127.0.0.1:8000/api/v1/accounts/login/"
 
     background_tasks.add_task(
         email_sender.send_activation_complete_email,
@@ -302,9 +302,9 @@ async def request_password_reset_token(
         await db.commit()
 
         stmt = (
-                select(PasswordResetTokenModel)
-                .where(PasswordResetTokenModel.user_id == user.id)
-            )
+            select(PasswordResetTokenModel)
+            .where(PasswordResetTokenModel.user_id == user.id)
+        )
         result = await db.execute(stmt)
         reset_token_string = result.scalars().first().token
     except SQLAlchemyError as e:
@@ -440,7 +440,7 @@ async def reset_password(
             detail="An error occurred while resetting the password."
         )
 
-    login_link = f"http://127.0.0.1:8000/api/v1/accounts/login/"
+    login_link = "http://127.0.0.1:8000/api/v1/accounts/login/"
 
     background_tasks.add_task(
         email_sender.send_password_reset_complete_email,

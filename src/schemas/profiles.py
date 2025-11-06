@@ -32,7 +32,7 @@ class ProfileBaseSchema(BaseModel):
     def validate_info(cls, value: str) -> str:
         if not value.strip():
             raise ValueError(
-                f"Info field cannot be empty or contain only spaces."
+                "Info field cannot be empty or contain only spaces."
             )
         return value
 
@@ -51,7 +51,7 @@ class ProfileCreationSchema(ProfileBaseSchema):
         avatar: UploadFile | None = File(None),
     ) -> "ProfileCreationSchema":
         """
-        A helper class method that defines how to map form data 
+        A helper class method that defines how to map form data
         to the Pydantic schema.
         """
         try:

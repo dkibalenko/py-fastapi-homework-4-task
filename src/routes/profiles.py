@@ -124,12 +124,12 @@ async def create_user_profile(
         file_name = f"avatars/{user_id}_avatar.{file_extension}"
         try:
             await s3_client.upload_file(file_name, contents)
-        except (S3ConnectionError, S3FileUploadError) as e:
+        except (S3ConnectionError, S3FileUploadError):
             raise HTTPException(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                 detail="Failed to upload avatar. Please try again later."
             )
-        
+
         avatar_url = await s3_client.get_file_url(file_name)
 
     try:
