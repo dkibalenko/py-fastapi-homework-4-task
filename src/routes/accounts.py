@@ -66,7 +66,6 @@ router = APIRouter()
     }
 )
 async def register_user(
-    request: Request,
     user_data: UserRegistrationRequestSchema,
     background_tasks: BackgroundTasks,
     db: AsyncSession = Depends(get_db),
@@ -137,9 +136,10 @@ async def register_user(
             detail="An error occurred during user creation."
         ) from e
     else:
-        # base_url = request.base_url
-        # account_acctivation_link = f"{base_url}api/v1/accounts/activate?token={activation_token_string}"
-        account_acctivation_link = f"http://127.0.0.1:8000/api/v1/accounts/activate?token={activation_token_string}"
+        account_acctivation_link = (
+            f"http://127.0.0.1:8000/api/v1/accounts/activate?"
+            f"token={activation_token_string}"
+        )
 
         background_tasks.add_task(
             email_sender.send_activation_email,
@@ -181,7 +181,6 @@ async def register_user(
     },
 )
 async def activate_account(
-    request: Request,
     activation_data: UserActivationRequestSchema,
     background_tasks: BackgroundTasks,
     db: AsyncSession = Depends(get_db),
@@ -220,7 +219,13 @@ async def activate_account(
     token_record = result.scalars().first()
 
     now_utc = datetime.now(timezone.utc)
-    if not token_record or cast(datetime, token_record.expires_at).replace(tzinfo=timezone.utc) < now_utc:
+    if (
+        not token_record 
+        or cast(
+            datetime, token_record.expires_at
+        )
+        .replace(tzinfo=timezone.utc) < now_utc
+    ):
         if token_record:
             await db.delete(token_record)
             await db.commit()
@@ -240,8 +245,6 @@ async def activate_account(
     await db.delete(token_record)
     await db.commit()
 
-    # base_url = request.base_url
-    # login_link = f"{base_url}api/v1/accounts/login/"
     login_link = f"http://127.0.0.1:8000/api/v1/accounts/login/"
 
     background_tasks.add_task(
@@ -264,7 +267,6 @@ async def activate_account(
     status_code=status.HTTP_200_OK,
 )
 async def request_password_reset_token(
-        request: Request,
         data: PasswordResetRequestSchema,
         background_tasks: BackgroundTasks,
         email_sender: EmailSenderInterface = Depends(get_accounts_email_notificator),
@@ -312,9 +314,10 @@ async def request_password_reset_token(
             detail="An error occurred during user creation."
         ) from e
     else:
-        # base_url = request.base_url
-        # request_reset_password_link = f"{base_url}api/v1/accounts/reset-password/complete?token={reset_token_string}"
-        request_reset_password_link = f"http://127.0.0.1:8000/api/v1/accounts/reset-password/complete?token={reset_token_string}"
+        request_reset_password_link = (
+            f"http://127.0.0.1:8000/api/v1/accounts/reset-password/complete?"
+            f"token={reset_token_string}"
+        )
 
         background_tasks.add_task(
             email_sender.send_password_reset_email,
@@ -371,7 +374,6 @@ async def request_password_reset_token(
     },
 )
 async def reset_password(
-    request: Request,
     data: PasswordResetCompleteRequestSchema,
     background_tasks: BackgroundTasks,
     email_sender: EmailSenderInterface = Depends(get_accounts_email_notificator),
@@ -438,8 +440,6 @@ async def reset_password(
             detail="An error occurred while resetting the password."
         )
 
-    # base_url = request.base_url
-    # login_link = f"{base_url}api/v1/accounts/login/"
     login_link = f"http://127.0.0.1:8000/api/v1/accounts/login/"
 
     background_tasks.add_task(
