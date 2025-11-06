@@ -8,12 +8,13 @@ from fastapi import UploadFile
 from database.models.accounts import GenderEnum
 
 
-def validate_name(name: str):
+def validate_name(name: str) -> str:
     if re.search(r'^[A-Za-z]*$', name) is None:
-        raise ValueError(f'{name} contains non-english letters')
+        raise ValueError(f"{name} contains non-english letters")
+    return name
 
 
-def validate_image(avatar: UploadFile) -> None:
+def validate_image(avatar: UploadFile) -> UploadFile:
     supported_image_formats = ["JPG", "JPEG", "PNG"]
     max_file_size = 1 * 1024 * 1024
 
@@ -26,20 +27,36 @@ def validate_image(avatar: UploadFile) -> None:
         avatar.file.seek(0)
         image_format = image.format
         if image_format not in supported_image_formats:
-            raise ValueError(f"Unsupported image format: {image_format}. Use one of next: {supported_image_formats}")
+            raise ValueError(
+                f"Unsupported image format: {image_format}. Use one of next: "
+                f"{supported_image_formats}"
+            )
     except IOError:
         raise ValueError("Invalid image format")
+    # finally:
+    #     if hasattr(image, "fp") and image.fp:
+    #         image.close()
+
+    return avatar
 
 
-def validate_gender(gender: str) -> None:
+def validate_gender(gender: str) -> str:
     if gender not in GenderEnum.__members__.values():
-        raise ValueError(f"Gender must be one of: {', '.join(g.value for g in GenderEnum)}")
+        raise ValueError(
+            f"Gender must be one of: {', '.join(g.value for g in GenderEnum)}"
+        )
+    return gender
 
 
-def validate_birth_date(birth_date: date) -> None:
+def validate_birth_date(birth_date: date) -> date:
     if birth_date.year < 1900:
-        raise ValueError('Invalid birth date - year must be greater than 1900.')
+        raise ValueError(
+            "Invalid birth date - year must be greater than 1900."
+        )
 
     age = (date.today() - birth_date).days // 365
+
     if age < 18:
-        raise ValueError('You must be at least 18 years old to register.')
+        raise ValueError("You must be at least 18 years old to register.")
+
+    return birth_date
