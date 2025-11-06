@@ -140,14 +140,23 @@ async def create_user_profile(
             gender=user_data.gender,
             date_of_birth=user_data.date_of_birth,
             info=user_data.info,
-            avatar=avatar_url
+            avatar=file_name
         )
 
         db.add(profile_model)
         await db.commit()
         await db.refresh(profile_model)
 
-        return ProfileResponseSchema.model_validate(profile_model)
+        return ProfileResponseSchema(
+            id=profile_model.id,
+            first_name=profile_model.first_name,
+            last_name=profile_model.last_name,
+            gender=profile_model.gender,
+            date_of_birth=profile_model.date_of_birth,
+            info=profile_model.info,
+            avatar=avatar_url,
+            user_id=profile_model.user_id
+        )
     except IntegrityError:
         await db.rollback()
         raise HTTPException(
