@@ -109,7 +109,7 @@ async def register_user(
             detail="Default user group not found."
         )
 
-    try:  # admin@admin.com (Admin@.12345)
+    try:
         new_user = UserModel.create(
             email=str(user_data.email),
             raw_password=user_data.password,
