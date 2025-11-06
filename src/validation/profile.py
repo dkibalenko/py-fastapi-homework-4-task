@@ -33,9 +33,6 @@ def validate_image(avatar: UploadFile) -> UploadFile:
             )
     except IOError:
         raise ValueError("Invalid image format")
-    finally:
-        if hasattr(image, "fp") and image.fp:
-            image.close()
 
     return avatar
 
